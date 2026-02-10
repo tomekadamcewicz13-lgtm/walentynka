@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Walentynka ❤️</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    color: white;
+    overflow: hidden;
+  }
+
+  section {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    padding: 20px;
+    text-align: center;
+    display: none;
+  }
+
+  section.active { display: block; }
+
+  h1,h2,p { text-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+
+  button {
+    font-size: 1rem;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    margin: 8px;
+    transition: transform 0.2s;
+  }
+
+  button:hover { transform: scale(1.05); }
+
+  .primary { background: #ff4d6d; color: white; }
+
+  .floating {
+    position: absolute;
+    border-radius: 15px;
+    opacity: 0.7;
+    z-index: 1;
+  }
+
+  .big { width: 150px; }
+
+  #runawayBtn { position: absolute; background: white; color: #ff4d6d; z-index: 3; }
+
+  .center-image {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    width: 250px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    opacity: 0;
+    animation: fadeInOut 2s forwards;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity:0; transform: translate(-50%, -50%) scale(0.5); }
+    20%,80% { opacity:1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity:0; transform: translate(-50%, -50%) scale(0.5); }
+  }
+
+  /* RESPONSYWNE STYLIZACJE */
+  @media (max-width: 600px) {
+    .big { width: 100px; }
+    .center-image { width: 180px; }
+    button { font-size: 0.9rem; padding: 10px 20px; }
+    section { padding: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ZDJĘCIA -->
+<img src="images/1.jpg" class="floating big">
+<img src="images/2.jpg" class="floating big">
+<img src="images/3.jpeg" class="floating">
+<img src="images/4.jpeg" class="floating">
+<img src="images/5.jpeg" class="floating">
+<img src="images/6.jpeg" class="floating">
+<img src="images/7.jpeg" class="floating">
+<img src="images/8.jpeg" class="floating">
+
+<!-- INTRO -->
+<section class="active" id="intro">
+  <h1>Hej Ty… 💕</h1>
+  <p>Mam do Ciebie jedno bardzo ważne pytanie</p>
+  <button class="primary" onclick="startQuiz()">Kliknij 💌</button>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <h2>Ale zanim je poznasz czas na szybki test 🧠</h2>
+  <p id="quiz-question"></p>
+  <div id="quiz-buttons"></div>
+</section>
+
+<!-- PYTANIE -->
+<section id="question">
+  <h1>Czy zostaniesz moją Walentynką? 💖</h1>
+  <button class="primary" onclick="next('end')">❤️ TAK</button>
+  <button id="runawayBtn">😳 NIE</button>
+</section>
+
+<!-- KONIEC -->
+<section id="end">
+  <h1>Kocham Cię ❤️</h1>
+  <p>Z Tobą każdy dzień jest wyjątkowy.</p>
+</section>
+
+<script>
+  // NAWIGACJA
+  function next(id){
+    document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  // QUIZ 3 PYTANIA
+  const quizQuestions = [
+    { question:"Kiedy byliśmy na pierwszej randce? 🤨",
+      answers:[
+        {text:"1 kwietnia 2024 ❤️", good:false},
+        {text:"17 marca 2024 ❤️", good:true},
+        {text:"14 marca 2024 ❤️", good:false}
+      ]},
+    { question:"Kto pierwszy się zakochał? 💖",
+      answers:[
+        {text:"Ty 😍", good:false},
+        {text:"Ja 😘", good:false},
+        {text:"My oboje ❤️", good:true}
+      ]},
+    { question:"Gdzie było nasze pierwsze spotkanie? ☕",
+      answers:[
+        {text:"W kawiarni ☕", good:false},
+        {text:"W parku 🌳", good:false},
+        {text:"W kinie 🎬", good:true}
+      ]}
+  ];
+  let currentQuestion = 0;
+
+  function startQuiz(){
+    next('quiz');       // pokazujemy sekcję quiz
+    loadQuestion();     // ładujemy pierwsze pytanie
+  }
+
+  function loadQuestion(){
+    const q = quizQuestions[currentQuestion];
+    document.getElementById("quiz-question").textContent = q.question;
+    const buttonsEl = document.getElementById("quiz-buttons");
+    buttonsEl.innerHTML="";
+    q.answers.forEach(ans=>{
+      const btn=document.createElement("button");
+      btn.textContent=ans.text;
+      btn.classList.add("primary");
+      btn.onclick=()=>handleAnswer(ans.good);
+      buttonsEl.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(isGood){
+    const img=document.createElement("img");
+    img.classList.add("center-image");
+    img.src=isGood?"images/cat.gif":"images/dog.gif";
+    document.body.appendChild(img);
+    setTimeout(()=>{
+      img.remove();
+      nextQuiz();
+    },2000);
+  }
+
+  function nextQuiz(){
+    currentQuestion++;
+    if(currentQuestion<quizQuestions.length){
+      loadQuestion();
+    } else {
+      next('question'); // po ostatnim pytaniu przechodzimy do pytania walentynkowego
+    }
+  }
+
+  // UCIEKAJĄCY PRZYCISK
+  const runawayBtn=document.getElementById("runawayBtn");
+  let scale=1;
+  runawayBtn.addEventListener("touchstart", moveBtn);
+  runawayBtn.addEventListener("mousemove", moveBtn);
+
+  function moveBtn(){
+    const maxX=window.innerWidth - runawayBtn.offsetWidth;
+    const maxY=window.innerHeight - runawayBtn.offsetHeight;
+    runawayBtn.style.left=Math.random()*maxX+"px";
+    runawayBtn.style.top=Math.random()*maxY+"px";
+    scale-=0.02;
+    if(scale<0.4) scale=0.4;
+    runawayBtn.style.transform=`scale(${scale})`;
+  }
+
+  // SPADAJĄCE ZDJĘCIA (RESPONSYWNE)
+  const photos=document.querySelectorAll('.floating');
+  const items=[];
+  photos.forEach(photo=>{
+    const size=photo.classList.contains('big')?150:100; // mniejsze na telefon
+    photo.style.width=size+'px';
+    const x=Math.random()*(window.innerWidth-size);
+    const y=Math.random()*-window.innerHeight;
+    const speed=Math.random()*2+1.5; // szybsze spadanie na telefon
+    photo.style.left=x+'px';
+    photo.style.top=y+'px';
+    items.push({el:photo,x,y,speed,size});
+  });
+
+  function animate(){
+    items.forEach(item=>{
+      item.y+=item.speed;
+      if(item.y>window.innerHeight){
+        item.y=-item.size;
+        item.x=Math.random()*(window.innerWidth-item.size);
+      }
+      item.el.style.top=item.y+'px';
+      item.el.style.left=item.x+'px';
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+</script>
+
+</body>
+</html>
